@@ -1,8 +1,17 @@
 export interface User {
   id: string;
+  email?: string;
+  created_at?: string;
+  user_metadata?: {
+    username?: string;
+  };
+}
+
+export interface ExtendedUser {
+  id: string;
   email: string;
-  username: string;
   created_at: string;
+  username: string;
 }
 
 export interface Product {
@@ -27,7 +36,7 @@ export interface Bid {
 }
 
 export interface AuthContextType {
-  user: User | null;
+  user: ExtendedUser | null;
   signUp: (email: string, password: string, username: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
