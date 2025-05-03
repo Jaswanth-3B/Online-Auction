@@ -44,7 +44,11 @@ const Home: React.FC = () => {
   }, []);
 
   const handleAddTestData = async () => {
-    if (!user) return;
+    // Only allow adding test data when logged in
+    if (!user) {
+      alert('Please log in to add test data');
+      return;
+    }
     await insertTestProducts(user.id);
     await fetchProducts();
   };
@@ -61,64 +65,80 @@ const Home: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Active Auctions</h1>
-        {user && (
-          <Link
-            to="/create-product"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Create Auction
-          </Link>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <Link
-            key={product.id}
-            to={`/products/${product.id}`}
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-          >
-            {product.image_url && (
-              <div className="aspect-w-16 aspect-h-9">
-                <img
-                  src={product.image_url}
-                  alt={product.title}
-                  className="object-cover w-full h-48"
-                />
-              </div>
-            )}
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">{product.title}</h2>
-              <p className="text-gray-600 mb-4 line-clamp-2">{product.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-bold text-indigo-600">
-                  ${product.current_price.toFixed(2)}
-                </span>
-                <span className="text-sm text-gray-500">
-                  Ends: {new Date(product.end_time).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {products.length === 0 && (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium text-gray-900">No active auctions</h3>
-          <p className="mt-2 text-gray-500">Check back later for new auctions.</p>
+        <div className="space-x-4">
           {user && (
+            <>
+              <button
+                onClick={handleAddTestData}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                Add Test Data
+              </button>
+              <Link
+                to="/create-product"
+                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Create Auction
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      {products.length === 0 ? (
+        <div className="text-center py-12">
+          <h2 className="text-xl font-medium text-gray-900 mb-2">No active auctions</h2>
+          <p className="text-gray-500">Check back later for new auctions.</p>
+          {user ? (
             <button
               onClick={handleAddTestData}
-              className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
-              Add Test Products
+              Add Example Auctions
             </button>
+          ) : (
+            <p className="mt-4 text-gray-600">Log in to add example auctions</p>
           )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <Link
+              key={product.id}
+              to={`/products/${product.id}`}
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+            >
+              {product.image_url ? (
+                <div className="aspect-w-16 aspect-h-9">
+                  <img
+                    src={product.image_url}
+                    alt={product.title}
+                    className="object-cover w-full h-48"
+                  />
+                </div>
+              ) : (
+                <div className="bg-gray-200 h-48 flex items-center justify-center">
+                  <span className="text-gray-500">No image available</span>
+                </div>
+              )}
+              <div className="p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">{product.title}</h2>
+                <p className="text-gray-600 mb-4 line-clamp-2">{product.description}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-indigo-600">
+                    ${product.current_price.toFixed(2)}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    Ends: {new Date(product.end_time).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
-export default Home; 
+export default Home;

@@ -10,13 +10,14 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { signIn } = useAuth();
 
+  // In the handleSubmit function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setError('');
       setLoading(true);
       await signIn(email, password);
-      navigate('/');
+      navigate('/home'); // Change this from '/' to '/home'
     } catch (err) {
       setError('Failed to sign in');
     } finally {
@@ -93,4 +94,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;
