@@ -18,21 +18,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const extendedUser: ExtendedUser = {
-          id: session.user.id,
-          email: session.user.email || '',
-          created_at: session.user.created_at || new Date().toISOString(),
-          username: session.user.user_metadata?.username || '',
-        };
-        setUser(extendedUser);
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const extendedUser: ExtendedUser = {
+            id: session.user.id,
+            email: session.user.email || '',
+            created_at: session.user.created_at || new Date().toISOString(),
+            username: session.user.user_metadata?.username || '',
+          };
+          setUser(extendedUser);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         const extendedUser: ExtendedUser = {
           id: session.user.id,
@@ -51,39 +59,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, username: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          username: username
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: username
+          }
         }
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert([{ id: data.user.id, username, email }]);
+
+        if (profileError) throw profileError;
       }
-    });
-
-    if (error) throw error;
-
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from('users')
-        .insert([{ id: data.user.id, username, email }]);
-
-      if (profileError) throw profileError;
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) throw error;
+      if (error) throw error;
+    } catch (error) {
+      console.error('Signin error:', error);
+      throw error;
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('Signout error:', error);
+      throw error;
+    }
   };
 
   return (

@@ -10,16 +10,19 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { signIn } = useAuth();
 
-  // In the handleSubmit function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setError('');
       setLoading(true);
       await signIn(email, password);
-      navigate('/home'); // Change this from '/' to '/home'
-    } catch (err) {
-      setError('Failed to sign in');
+      // Add a small delay to ensure the session is properly set
+      setTimeout(() => {
+        navigate('/home');
+      }, 100);
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Failed to sign in. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -78,7 +81,7 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
