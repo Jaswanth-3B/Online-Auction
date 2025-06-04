@@ -77,10 +77,10 @@ const ProductDetails: React.FC = () => {
   useEffect(() => {
     if (!product) return;
 
-    const endTime = new Date(product.end_time).getTime();
-
     const updateTimer = () => {
-      const now = new Date().getTime();
+      // Ensure product.end_time is parsed as UTC
+      const endTime = Date.parse(product.end_time);
+      const now = Date.now(); // Get current time in milliseconds (UTC)
       const timeRemaining = endTime - now;
       setTimeLeft(Math.max(0, timeRemaining)); // Ensure time left is not negative
     };

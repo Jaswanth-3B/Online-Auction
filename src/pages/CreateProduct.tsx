@@ -67,7 +67,7 @@ const CreateProduct: React.FC = () => {
           description: formData.description,
           starting_price: parseFloat(formData.starting_price),
           current_price: parseFloat(formData.starting_price),
-          end_time: formData.end_time,
+          end_time: new Date(formData.end_time).toISOString(),
           seller_id: user.id,
           status: 'active',
           image_url: imageUrl, // Store the image URL
