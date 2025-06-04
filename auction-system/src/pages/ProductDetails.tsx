@@ -138,7 +138,7 @@ const ProductDetails: React.FC = () => {
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">Auction Ends</h2>
                 <p className="text-lg text-gray-600">
-                  {new Date(product.end_time).toUTCString()}
+                  {new Date(product.end_time).toLocaleString()}
                   {isAuctionEnded && <span className="text-red-500 ml-2">(Ended)</span>}
                 </p>
               </div>
