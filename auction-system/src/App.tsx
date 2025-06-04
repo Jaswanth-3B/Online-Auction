@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import UserProfile from './pages/UserProfile';
 import ProductDetails from './pages/ProductDetails';
+import CreateProduct from './pages/CreateProduct';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import './App.css';
@@ -32,6 +33,11 @@ function App() {
             <Route path="/products/:id" element={
               <ProtectedRoute>
                 <ProductDetails />
+              </ProtectedRoute>
+            } />
+            <Route path="/create-product" element={
+              <ProtectedRoute>
+                <CreateProduct />
               </ProtectedRoute>
             } />
             {/* Catch all other routes and redirect to login */}
