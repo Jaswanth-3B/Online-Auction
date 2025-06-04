@@ -62,7 +62,7 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 bg-gray-100 text-gray-900 min-h-screen">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Active Auctions</h1>
         <div className="space-x-4">
@@ -76,9 +76,15 @@ const Home: React.FC = () => {
               </button>
               <Link
                 to="/create-product"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
               >
                 Create Auction
+              </Link>
+              <Link
+                to="/profile"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                My Profile
               </Link>
             </>
           )}
@@ -87,8 +93,8 @@ const Home: React.FC = () => {
 
       {products.length === 0 ? (
         <div className="text-center py-12">
-          <h2 className="text-xl font-medium text-gray-900 mb-2">No active auctions</h2>
-          <p className="text-gray-500">Check back later for new auctions.</p>
+          <h2 className="text-xl font-medium text-gray-700 mb-2">No active auctions</h2>
+          <p className="text-gray-600">Check back later for new auctions.</p>
           {user ? (
             <button
               onClick={handleAddTestData}
@@ -106,7 +112,7 @@ const Home: React.FC = () => {
             <Link
               key={product.id}
               to={`/products/${product.id}`}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 block"
             >
               {product.image_url ? (
                 <div className="aspect-w-16 aspect-h-9">
@@ -125,10 +131,10 @@ const Home: React.FC = () => {
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">{product.title}</h2>
                 <p className="text-gray-600 mb-4 line-clamp-2">{product.description}</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-indigo-600">
+                  <span className="text-lg font-bold text-orange-600">
                     ${product.current_price.toFixed(2)}
                   </span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-600">
                     Ends: {new Date(product.end_time).toLocaleDateString()}
                   </span>
                 </div>
