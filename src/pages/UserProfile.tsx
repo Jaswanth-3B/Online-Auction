@@ -7,6 +7,7 @@ const UserProfile: React.FC = () => {
   const { user, signOut } = useAuth();
   const [myProducts, setMyProducts] = useState<Product[]>([]);
   const [myBids, setMyBids] = useState<Bid[]>([]);
+  const [myBoughtItems, setMyBoughtItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,6 +35,19 @@ const UserProfile: React.FC = () => {
 
         setMyProducts(products || []);
         setMyBids(bids || []);
+
+        // TODO: Fetch user's bought items
+        // This requires a query to find ended auctions where the user has the highest bid.
+        // Example conceptual query (needs refinement based on your bid/product structure):
+        // const { data: boughtItems, error: boughtItemsError } = await supabase
+        //   .from('products')
+        //   .select('*')
+        //   .eq('status', 'ended')
+        //   .in('id', supabase.from('bids').select('product_id').eq('user_id', user.id).order('bid_amount', { ascending: false }).limit(1)); // This is a simplified example
+
+        // For now, setting a placeholder empty array
+        setMyBoughtItems([]); // Replace with fetched data
+
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
@@ -61,13 +75,13 @@ const UserProfile: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="container mx-auto px-4 py-8 bg-gray-100 text-gray-900 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
           <button
             onClick={handleSignOut}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            className="px-4 py-2 border rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           >
             Sign Out
           </button>
@@ -79,22 +93,22 @@ const UserProfile: React.FC = () => {
             {myProducts.length > 0 ? (
               <div className="space-y-4">
                 {myProducts.map((product) => (
-                  <div key={product.id} className="bg-white rounded-lg shadow-md p-4">
+                  <div key={product.id} className="bg-gray-100 rounded-lg shadow-md p-4">
                     <h3 className="text-lg font-medium text-gray-900">{product.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-600 mt-1">
                       Current Price: ${product.current_price.toFixed(2)}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-600">
                       Status: {product.status}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-600">
                       Ends: {new Date(product.end_time).toLocaleString()}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">You haven't created any auctions yet.</p>
+              <p className="text-gray-600">You haven't created any auctions yet.</p>
             )}
           </div>
 
@@ -103,21 +117,41 @@ const UserProfile: React.FC = () => {
             {myBids.length > 0 ? (
               <div className="space-y-4">
                 {myBids.map((bid) => (
-                  <div key={bid.id} className="bg-white rounded-lg shadow-md p-4">
+                  <div key={bid.id} className="bg-gray-100 rounded-lg shadow-md p-4">
                     <p className="text-lg font-medium text-gray-900">
                       ${bid.bid_amount.toFixed(2)}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-600">
                       Placed: {new Date(bid.timestamp).toLocaleString()}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">You haven't placed any bids yet.</p>
+              <p className="text-gray-600">You haven't placed any bids yet.</p>
             )}
           </div>
         </div>
+
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Items You Won</h2>
+          {myBoughtItems.length > 0 ? (
+            <div className="space-y-4">
+              {/* Map over bought items here */}
+              {/* Example Structure: */}
+              {/* {myBoughtItems.map((item) => ( */}
+              {/*   <div key={item.id} className="bg-gray-100 rounded-lg shadow-md p-4"> */}
+              {/*     <h3 className="text-lg font-medium text-gray-900">{item.title}</h3> */}
+              {/*     <p className="text-sm text-gray-600 mt-1">Winning Bid: ${item.winning_bid_amount.toFixed(2)}</p> */}
+              {/*   </div> */}
+              {/* ))} */}
+              <p className="text-gray-600">Display your won items here.</p>
+            </div>
+          ) : (
+            <p className="text-gray-600">You haven't won any auctions yet.</p>
+          )}
+        </div>
+
       </div>
     </div>
   );
