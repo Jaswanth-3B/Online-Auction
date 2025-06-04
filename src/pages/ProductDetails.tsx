@@ -25,6 +25,23 @@ const ProductDetails: React.FC = () => {
           .single();
 
         if (error) throw error;
+
+        // Check if the auction has ended and update status if necessary
+        if (data && data.status === 'active' && new Date(data.end_time).getTime() < Date.now()) {
+          const { error: updateError } = await supabase
+            .from('products')
+            .update({ status: 'ended' })
+            .eq('id', id);
+
+          if (updateError) {
+            console.error('Error updating product status to ended:', updateError);
+          } else {
+            // If status updated successfully, use the updated data
+            setProduct({ ...data, status: 'ended' });
+            return; // Exit to avoid setting the old status
+          }
+        }
+
         setProduct(data);
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -38,7 +55,8 @@ const ProductDetails: React.FC = () => {
           .from('bids')
           .select('*')
           .eq('product_id', id)
-          .order('bid_amount', { ascending: false });
+          .order('bid_amount', { ascending: false })
+          .limit(2);
 
         if (error) throw error;
         setBids(data || []);

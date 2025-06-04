@@ -36,17 +36,27 @@ const UserProfile: React.FC = () => {
         setMyProducts(products || []);
         setMyBids(bids || []);
 
-        // TODO: Fetch user's bought items
-        // This requires a query to find ended auctions where the user has the highest bid.
-        // Example conceptual query (needs refinement based on your bid/product structure):
-        // const { data: boughtItems, error: boughtItemsError } = await supabase
-        //   .from('products')
-        //   .select('*')
-        //   .eq('status', 'ended')
-        //   .in('id', supabase.from('bids').select('product_id').eq('user_id', user.id).order('bid_amount', { ascending: false }).limit(1)); // This is a simplified example
+        // Fetch user's won items
+        const { data: endedProducts, error: endedProductsError } = await supabase
+          .from('products')
+          .select('*, bids!product_id(bid_amount, user_id)') // Select product and related bids
+          .eq('status', 'ended');
 
-        // For now, setting a placeholder empty array
-        setMyBoughtItems([]); // Replace with fetched data
+        if (endedProductsError) throw endedProductsError;
+
+        // Filter ended products to find those won by the current user
+        const wonItems = endedProducts
+          .filter(product => product.bids.length > 0)
+          .filter(product => {
+            // Find the highest bid for the product
+            const highestBid = product.bids.reduce((maxBid: Bid, currentBid: Bid) => {
+              return currentBid.bid_amount > maxBid.bid_amount ? currentBid : maxBid;
+            }, product.bids[0]);
+            // Check if the highest bid belongs to the current user
+            return highestBid.user_id === user.id;
+          });
+
+        setMyBoughtItems(wonItems);
 
       } catch (error) {
         console.error('Error fetching user data:', error);
