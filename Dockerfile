@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Install type definitions for uuid
+RUN npm install --save-dev @types/uuid
+
 # Copy the rest of the application
 COPY . .
 
