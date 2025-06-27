@@ -22,7 +22,7 @@ export interface Product {
   current_price: number;
   end_time: string;
   seller_id: string;
-  status: 'active' | 'ended' | 'cancelled';
+  status: 'active' | 'ended' | 'cancelled' | 'sold';
   created_at: string;
   image_url?: string;
 }
@@ -33,6 +33,18 @@ export interface Bid {
   user_id: string;
   bid_amount: number;
   timestamp: string;
+}
+
+export interface Purchase {
+  id: string;
+  product_id: string;
+  buyer_id: string;
+  seller_id: string;
+  winning_bid_amount: number;
+  payment_status: 'pending' | 'completed' | 'failed';
+  purchase_date: string;
+  product_title: string;
+  product_image_url?: string;
 }
 
 export interface AuthContextType {

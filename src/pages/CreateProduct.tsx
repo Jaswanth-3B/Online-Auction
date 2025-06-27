@@ -4,6 +4,61 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../utils/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 
+function getLocalDescriptionSuggestion(title: string): string {
+  const lower = title.toLowerCase();
+  if (lower.includes('camera')) {
+    return 'Capture memories with this high-quality camera, perfect for photography enthusiasts and collectors.';
+  }
+  if (lower.includes('watch')) {
+    return 'A timeless piece for your collection. This watch combines elegance and precision.';
+  }
+  if (lower.includes('console') || lower.includes('playstation') || lower.includes('xbox') || lower.includes('nintendo')) {
+    return 'Experience next-level gaming with this powerful console, ready for hours of entertainment.';
+  }
+  if (lower.includes('phone') || lower.includes('smartphone')) {
+    return 'Stay connected with this feature-packed smartphone, offering performance and style.';
+  }
+  if (lower.includes('laptop') || lower.includes('macbook') || lower.includes('notebook')) {
+    return 'Boost your productivity with this reliable and high-performance laptop.';
+  }
+  if (lower.includes('car')) {
+    return 'Drive in style with this well-maintained car, perfect for daily commutes or road trips.';
+  }
+  if (lower.includes('bike') || lower.includes('bicycle')) {
+    return 'Enjoy the outdoors with this sturdy and comfortable bike, ideal for all terrains.';
+  }
+  if (lower.includes('book')) {
+    return 'Dive into a world of knowledge and adventure with this must-read book.';
+  }
+  if (lower.includes('jewelry') || lower.includes('ring') || lower.includes('necklace')) {
+    return 'Add a touch of elegance to your collection with this exquisite piece of jewelry.';
+  }
+  if (lower.includes('painting') || lower.includes('art')) {
+    return 'Enhance your space with this beautiful artwork, a true conversation starter.';
+  }
+  if (lower.includes('furniture') || lower.includes('sofa') || lower.includes('table') || lower.includes('chair')) {
+    return 'Upgrade your home with this stylish and comfortable piece of furniture.';
+  }
+  if (lower.includes('collectible') || lower.includes('coin') || lower.includes('stamp')) {
+    return 'A rare collectible item, perfect for enthusiasts and serious collectors alike.';
+  }
+  if (lower.includes('toy') || lower.includes('lego') || lower.includes('action figure')) {
+    return 'Bring joy to kids and collectors with this fun and sought-after toy.';
+  }
+  if (lower.includes('shoes') || lower.includes('sneaker')) {
+    return 'Step out in style with these fashionable and comfortable shoes.';
+  }
+  if (lower.includes('bag') || lower.includes('handbag') || lower.includes('backpack')) {
+    return 'Carry your essentials in style with this versatile and trendy bag.';
+  }
+  if (lower.includes('instrument') || lower.includes('guitar') || lower.includes('piano')) {
+    return 'Make music with this quality instrument, perfect for beginners and pros alike.';
+  }
+  // Add more as needed...
+  // Default template
+  return `Introducing "${title}" – a unique item now available for auction!`;
+}
+
 const CreateProduct: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -16,6 +71,7 @@ const CreateProduct: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [suggestedDescription, setSuggestedDescription] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -28,6 +84,12 @@ const CreateProduct: React.FC = () => {
     } else {
       setImageFile(null);
     }
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData((prev) => ({ ...prev, title: value }));
+    setSuggestedDescription(getLocalDescriptionSuggestion(value));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,11 +148,13 @@ const CreateProduct: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-100 text-gray-900 min-h-screen">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Create New Auction</h1>
+    <div className="px-4 py-8 min-h-screen">
+      <div className="max-w-2xl mx-auto bg-[rgba(24,25,27,0.92)] border-2 border-[#18191b] rounded-2xl shadow-lg p-8">
+        <h1 className="text-4xl font-extrabold text-white text-center mb-8" style={{ textShadow: '2px 2px 6px #000, 0 0 2px #000' }}>
+          Create New Auction
+        </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
               <span className="block sm:inline">{error}</span>
@@ -98,7 +162,7 @@ const CreateProduct: React.FC = () => {
           )}
 
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="block text-lg font-semibold text-white mb-2">
               Title
             </label>
             <input
@@ -107,45 +171,56 @@ const CreateProduct: React.FC = () => {
               name="title"
               required
               value={formData.title}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-900"
+              onChange={handleTitleChange}
+              className="mt-1 block w-full rounded-md border border-[#444] bg-[#232323] text-white placeholder-gray-400 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-base py-2 px-3"
+              placeholder="Enter auction title"
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-lg font-semibold text-white mb-2">
               Description
             </label>
             <textarea
               id="description"
               name="description"
-              rows={4}
+              rows={3}
               required
               value={formData.description}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-900"
+              className="mt-1 block w-full rounded-md border border-[#444] bg-[#232323] text-white placeholder-gray-400 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-base py-2 px-3"
+              placeholder="Enter auction description"
             />
+            {suggestedDescription && (
+              <div className="mt-2 text-sm text-orange-300 cursor-pointer hover:underline" onClick={() => setFormData((prev) => ({ ...prev, description: suggestedDescription }))}>
+                Suggestion: {suggestedDescription}
+              </div>
+            )}
+            <div className="mt-2 text-xs text-gray-400">
+              Supported keywords: camera, watch, console, phone, laptop, car, bike, book, jewelry, painting, furniture, collectible, toy, shoes, bag, instrument
+            </div>
           </div>
 
           <div>
-            <label htmlFor="starting_price" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="startingPrice" className="block text-lg font-semibold text-white mb-2">
               Starting Price ($)
             </label>
             <input
               type="number"
-              id="starting_price"
+              id="startingPrice"
               name="starting_price"
-              min="0"
-              step="0.01"
               required
               value={formData.starting_price}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-900"
+              className="mt-1 block w-full rounded-md border border-[#444] bg-[#232323] text-white placeholder-gray-400 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-base py-2 px-3 hide-number-arrows"
+              placeholder="Enter starting price"
+              min="0"
+              step="0.01"
             />
           </div>
 
           <div>
-            <label htmlFor="end_time" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="end_time" className="block text-lg font-semibold text-white mb-2">
               Auction End Time
             </label>
             <input
@@ -156,13 +231,14 @@ const CreateProduct: React.FC = () => {
               value={formData.end_time}
               onChange={handleChange}
               min={new Date().toISOString().slice(0, 16)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-900"
+              className="mt-1 block w-full rounded-md border border-[#444] bg-[#232323] text-white placeholder-gray-400 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-base py-2 px-3"
+              placeholder="Select end time"
             />
           </div>
 
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-              Image
+            <label htmlFor="image" className="block text-lg font-semibold text-white mb-2">
+              Product Image
             </label>
             <input
               type="file"
@@ -170,23 +246,23 @@ const CreateProduct: React.FC = () => {
               name="image"
               accept="image/*"
               onChange={handleImageChange}
-              className="mt-1 block w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+              className="file-matte"
             />
-            {imageFile && <p className="mt-2 text-sm text-gray-600">Selected file: {imageFile.name}</p>}
+            {imageFile && <p className="mt-2 text-sm text-gray-300">Selected file: {imageFile.name}</p>}
           </div>
 
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end space-x-4 mt-8">
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+              className="button bg-[#232323] text-white border border-[#444] hover:bg-[#18191b]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+              className="button button-orange"
             >
               {loading ? 'Creating...' : 'Create Auction'}
             </button>

@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import UserProfile from './pages/UserProfile';
 import ProductDetails from './pages/ProductDetails';
 import CreateProduct from './pages/CreateProduct';
+import Payment from './pages/Payment';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import './App.css';
@@ -38,6 +39,11 @@ function App() {
             <Route path="/create-product" element={
               <ProtectedRoute>
                 <CreateProduct />
+              </ProtectedRoute>
+            } />
+            <Route path="/payment/:id" element={
+              <ProtectedRoute>
+                <Payment />
               </ProtectedRoute>
             } />
             {/* Catch all other routes and redirect to login */}

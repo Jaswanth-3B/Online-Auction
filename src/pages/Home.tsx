@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../utils/supabaseClient';
 import { Product } from '../types';
 import { insertTestProducts } from '../utils/testData';
+import AuctionCard from '../components/AuctionCard';
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const fetchProducts = async () => {
     try {
@@ -17,7 +19,6 @@ const Home: React.FC = () => {
         .select('*')
         .eq('status', 'active')
         .order('created_at', { ascending: false });
-
       if (error) throw error;
       setProducts(data || []);
     } catch (error) {
@@ -29,7 +30,6 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     fetchProducts();
-
     // Subscribe to real-time updates
     const subscription = supabase
       .channel('products')
@@ -37,14 +37,12 @@ const Home: React.FC = () => {
         fetchProducts();
       })
       .subscribe();
-
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
   const handleAddTestData = async () => {
-    // Only allow adding test data when logged in
     if (!user) {
       alert('Please log in to add test data');
       return;
@@ -62,35 +60,32 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-100 text-gray-900 min-h-screen">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Active Auctions</h1>
-        <div className="space-x-4">
-          {user && (
-            <>
-              <button
-                onClick={handleAddTestData}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                Add Test Data
-              </button>
-              <Link
-                to="/create-product"
-                className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-              >
-                Create Auction
-              </Link>
-              <Link
-                to="/profile"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                My Profile
-              </Link>
-            </>
-          )}
+    <div className="px-4 py-8 min-h-screen">
+      <div className="flex flex-col items-center mb-8">
+        <h1 className="text-5xl font-extrabold text-white text-center" style={{ textShadow: '2px 2px 6px #000, 0 0 2px #000' }}>
+          Active Auctions
+        </h1>
+        <div className="flex justify-end mt-6 space-x-4">
+          <button
+            onClick={handleAddTestData}
+            className="button button-green"
+          >
+            Add Test Data
+          </button>
+          <button
+            onClick={() => navigate('/create-product')}
+            className="button button-orange"
+          >
+            Create Auction
+          </button>
+          <button
+            onClick={() => navigate('/profile')}
+            className="button button-purple"
+          >
+            My Profile
+          </button>
         </div>
       </div>
-
       {products.length === 0 ? (
         <div className="text-center py-12">
           <h2 className="text-xl font-medium text-gray-700 mb-2">No active auctions</h2>
@@ -98,7 +93,7 @@ const Home: React.FC = () => {
           {user ? (
             <button
               onClick={handleAddTestData}
-              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              className="mt-4 button button-green"
             >
               Add Example Auctions
             </button>
@@ -107,38 +102,19 @@ const Home: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-10 mt-8">
           {products.map((product) => (
             <Link
               key={product.id}
               to={`/products/${product.id}`}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 block"
+              className="block"
             >
-              {product.image_url ? (
-                <div className="aspect-w-16 aspect-h-9">
-                  <img
-                    src={product.image_url}
-                    alt={product.title}
-                    className="object-cover w-full h-48"
-                  />
-                </div>
-              ) : (
-                <div className="bg-gray-200 h-48 flex items-center justify-center">
-                  <span className="text-gray-500">No image available</span>
-                </div>
-              )}
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">{product.title}</h2>
-                <p className="text-gray-600 mb-4 line-clamp-2">{product.description}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-orange-600">
-                    ${product.current_price.toFixed(2)}
-                  </span>
-                  <span className="text-sm text-gray-600">
-                    Ends: {new Date(product.end_time).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
+              <AuctionCard
+                title={product.title}
+                description={product.description}
+                price={product.current_price}
+                imageUrl={product.image_url}
+              />
             </Link>
           ))}
         </div>
